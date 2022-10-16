@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "H9jbu4oQpIGJd1pNrpvjKLpaQb+bgFnoBX9JgvXZ+o/lSk1pGmWf4qzhQphPRdJq/TionZuREkCwZ2A0UibuVA==",
+  "dgSpecHash": "CkqUf9SWNnhhpoHhqg1oJD3nUtO8R+D2D3m6QtanBtWjRwh4dtAZ8bXJ2dokyDBXljxroRv/ShgGgCDTdkeH0g==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Ольга\\Downloads\\itrying\\itrying\\itrying.csproj",
+  "projectFilePath": "C:\\Users\\Ольга\\Desktop\\itrying\\itrying\\itrying.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Ольга\\.nuget\\packages\\bogus\\34.0.2\\bogus.34.0.2.nupkg.sha512",
     "C:\\Users\\Ольга\\.nuget\\packages\\google.protobuf\\3.19.4\\google.protobuf.3.19.4.nupkg.sha512",

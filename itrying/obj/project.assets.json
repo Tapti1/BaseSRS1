@@ -876,11 +876,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Ольга\\Downloads\\itrying\\itrying\\itrying.csproj",
+      "projectUniqueName": "C:\\Users\\Ольга\\Desktop\\itrying\\itrying\\itrying.csproj",
       "projectName": "itrying",
-      "projectPath": "C:\\Users\\Ольга\\Downloads\\itrying\\itrying\\itrying.csproj",
+      "projectPath": "C:\\Users\\Ольга\\Desktop\\itrying\\itrying\\itrying.csproj",
       "packagesPath": "C:\\Users\\Ольга\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Ольга\\Downloads\\itrying\\itrying\\obj\\",
+      "outputPath": "C:\\Users\\Ольга\\Desktop\\itrying\\itrying\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Ольга\\AppData\\Roaming\\NuGet\\NuGet.Config",

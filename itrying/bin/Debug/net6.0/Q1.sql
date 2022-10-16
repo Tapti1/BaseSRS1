@@ -1,1 +1,1 @@
-SELECT DiSTINCT breed.title FROM cat INNER JOIN breed ON cat.breed_id=breed.breed_id
+SELECT DiSTINCT catbd.breed.title FROM catbd.cat INNER JOIN catbd.breed ON catbd.cat.breed_id=catbd.breed.breed_id

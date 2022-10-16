@@ -127,7 +127,7 @@ namespace itrying
         {
             string s, r = "";      //чтобы без повторов
             Dictionary<string, int> d = new Dictionary<string, int>();
-            while (d.Count() < max_owner)
+            while (d.Count() <= max_owner)
             {
                 s = faker.Name.FullName();
                 d[s] = 1;
@@ -155,51 +155,79 @@ namespace itrying
                 nick.Add(s);
                 for(int i = 0; i < faker.Random.Number(4); i++)
                 {
-                    if (nick.Count() < max_nickname)
+                    if (nick.Count() <= max_nickname)
                     {
                         nick.Add(s);
                     }
                 }
             }
             sr.Close();
-            r = r + "INSERT INTO cat(nickname,breed_id,pride_id,age) VALUES ";    //сам запрос
+
+            string non_pride = "", non_breed = "";
+            int random_pride_del = faker.Random.Number(3, 5); //рандомные прайды без котов
+            for(int i=0;i< random_pride_del; i++)   
+            {
+                int x= faker.Random.Number(1, max_pride);
+                non_pride=non_pride + "(" + x + ")";
+            }
+
+            int random_breed_del=faker.Random.Number(2, 5); //рандомные породы без котов
+
+            for (int i = 0; i < random_breed_del; i++)
+            {
+                int x = faker.Random.Number(1, max_breed);
+                non_breed = non_breed + "(" + x + ")";
+            }
+            r = r + "INSERT INTO cat(nickname,breed_id,pride_id,age) VALUES ";    
             for(int i = 0; i <= max_cat; i++)
             {
-                r = r + ($"('{nick[i]}','{i % max_breed+1}','{ i % max_pride+1}','{faker.Random.Number(max_age)+1}')");
+                int random_breed=faker.Random.Number(1, max_breed); //пока нужный не найдём
+                while(non_breed.IndexOf($"({random_breed})") != -1)
+                {
+                    random_breed = faker.Random.Number(1, max_breed);   //на рандоме мы берём
+                }
+
+                int random_pride=faker.Random.Number(1, max_pride);
+                while (non_pride.IndexOf($"({random_pride})") != -1)
+                {
+                    random_pride = faker.Random.Number(1, max_pride);   
+                }
+
+                r = r + ($"('{nick[i]}','{random_breed}','{random_pride}','{faker.Random.Number(max_age)+1}')");
                 if (i != max_cat) r = r + ",";
             }
             return r;            
         }
         public string cat_owner()
         {
-            int rand2 = faker.Random.Number(2, 5);
+            int rand2 = faker.Random.Number(2, 3);
             int rand3 = faker.Random.Number(5, 10);
-
-            string r = "";
             
-            r = r + "INSERT INTO cat_owner(cat_id,owner_id) VALUES "; 
+            string r = "INSERT INTO cat_owner(cat_id,owner_id) VALUES "; 
             for(int i = 0; i < rand2; i++)  
             {
                 int random_cat=faker.Random.Number(1,max_cat);
-                int random_owner1=faker.Random.Number(max_owner), random_owner2 = faker.Random.Number(max_owner);
                 
-                while (random_owner2 == random_owner1)
+                int random_owner1=faker.Random.Number(1,max_owner), random_owner2 = faker.Random.Number(1,max_owner);
+                
+                while (random_owner2 == random_owner1) //хозяева разные
                 {
                     random_owner2 = faker.Random.Number(1,max_owner);
                 }
                 
-                if (r.IndexOf($"('{random_cat}','{random_owner1}')") != -1 || r.IndexOf($"('{random_cat}','{random_owner2}')") != -1)
+                if (r.IndexOf($"('{random_cat}','{random_owner1}')") != -1 || r.IndexOf($"('{random_cat}','{random_owner2}')") != -1) //этой запис
                 {
-                    i++;
+                    i--;
                     continue;
                 }                
                 r = r + ($"('{random_cat}','{random_owner1}'),");
                 r = r + ($"('{random_cat}','{random_owner2}'),");
             }
 
-            for (int i = 0; i < rand2; i++)
+            for (int i = 0; i < rand3; i++)
             {
                 int random_cat = faker.Random.Number(1,max_cat);
+                
                 int random_owner1 = faker.Random.Number(1,max_owner), random_owner2 = faker.Random.Number(1, max_owner);
                 
                 while (random_owner2 == random_owner1)
@@ -215,27 +243,27 @@ namespace itrying
                 
                 if (r.IndexOf($"('{random_cat}','{random_owner1}')") != -1 || r.IndexOf($"('{random_cat}','{random_owner2}')") != -1 || r.IndexOf($"('{random_cat}','{random_owner3}')") != -1)
                 {
-                    i++;
+                    i--;
                     continue;
                 }
                 r = r + ($"('{random_cat}','{random_owner1}'),");
                 r = r + ($"('{random_cat}','{random_owner2}'),");
-                r = r + ($"('{random_cat}','{random_owner3}')");
-                if (rand2 + rand3 < max_cat)
-                {
-                    r = r + ",";
-                }
+                r = r + ($"('{random_cat}','{random_owner3}'),");
             }
+            int max_con = faker.Random.Number(40, 60);
 
-            for (int i = rand2+rand3; i <= max_cat; i++)  
+            for (int i = 0; i <= max_con; i++)  
             {
-                if (r.IndexOf($"('{i%max_cat+1}','{i% max_owner+1}')") != -1)
+                int random_owner = faker.Random.Number(1, max_owner);
+                int random_cat = faker.Random.Number(1, max_cat);
+                
+                if (r.IndexOf($"('{random_cat}','{random_owner}')") != -1)
                 {
-                    i++;
+                    i--;
                     continue;
                 }
-                r = r + ($"('{i % max_cat+1}','{i % max_owner+1}')");
-                if (i != max_cat) r = r + ',';
+                r = r + ($"('{random_cat}','{random_owner}')");
+                if (i != max_con) r = r + ',';
             }
             
             return r;
@@ -244,143 +272,168 @@ namespace itrying
         public string owner_family()
         {
             int max_con = faker.Random.Number(40, 60);
-            string r = "";
+           
             int max_family_cat = faker.Random.Number(2, 5);
 
+            //находим котов с неколькими хозяевами
             string sql = $"SELECT cat_id,count(owner_id) as num FROM catbd.cat_owner group by cat_id having num > 1";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader reader = cmd.ExecuteReader();
-            reader.Read();
-            List<int> Cats = new List<int>(max_family_cat);
-            for(int i = 0; i < max_family_cat; i++)
-            {
-                Cats[i] = reader.GetValue(i);
-            }
-            //находим котов с неколькими хозяевами
-
-            r = r + "INSERT INTO owner_family(family_id,owner_id) VALUES ";
-            Console.WriteLine(reader.GetValue(0));
-            for (int i = 0; i < max_con; i++)
-            {
-                /*int rand_cat = r[0];
-                string sql1 = $"SELECT owner_id FROM catbd.cat_owner where cat_id ={rand_cat}";
-                MySqlCommand cmd1 = new MySqlCommand(sql, conn);
-                MySqlDataReader reader1 = cmd.ExecuteReader();
-                IDataReader dataRecord1 = reader;
-                //и этих хозяев
-
-                int rand_family= faker.Random.Number(1,max_family);
-
-                r = r + ($"('{rand_family}','{i % max_owner + 1}')");
-                //в одну семью
-                */
+            
+            List<int> Cats = new List<int>();
+            for (int i = 0; i < max_family_cat && reader.Read(); i++)
+            {                
+                int x = reader.GetInt32(0);
+                Cats.Add(x);               
             }            
+            reader.Close();
+
+
+            string r = "INSERT INTO owner_family(family_id,owner_id) VALUES ";
+            for (int i = 0; i < max_family_cat; i++)
+            {
+                //хозяева этого кота
+                sql = $"SELECT owner_id FROM cat_owner where cat_id={Cats[i]}";
+
+                //помещаем их в одну семью
+                cmd = new MySqlCommand(sql, conn);
+                reader = cmd.ExecuteReader();
+                int random_family = faker.Random.Number(1, max_family);
+
+               while(reader.Read())
+                {
+                    int x = reader.GetInt32(0);
+                    if (r.IndexOf($"('{random_family}','{x}')") == -1)    //одинаковые записи не добавляем
+                    {
+                        r = r + ($"('{random_family}','{x}'),");
+                        max_con--;
+                    }
+                }
+                reader.Close();
+            }
+
+            //остальные связи
+            int random_family_del=faker.Random.Number(2,3);
+            string non_family = "";
+
+            for (int i = 0; i < random_family_del; i++) //семьи без хозяев
+            {
+                int x = faker.Random.Number(1, max_family);
+                non_family = non_family + "(" + x + ")";
+            }
             for (int i = 1; i <= max_con; i++)
             {
-                if (r.IndexOf($"('{i % max_family + 1}','{ i % max_owner + 1}')") == -1)
+                int random_family = faker.Random.Number(1, max_family);
+
+                int random_owner = faker.Random.Number(1, max_owner);
+                while (non_family.IndexOf($"({random_family})") != -1)
                 {
-                    r = r + ($"('{ i % max_family + 1}','{ i % max_owner + 1}')");
+                    random_family = faker.Random.Number(1,max_family);
+                }
+                if (r.IndexOf($"('{random_family}','{random_owner}')") == -1)
+                {
+                    r = r + ($"('{random_family}','{random_owner}')");
                     if (i != max_con) r = r + ',';
                 }
                 else
                 {
-                    i++;
+                    i--;
                 }
             }
             return r;
         }
-        public void QuareryOut(IDataReader r,int num)
+        public bool QuareryOut(MySqlDataReader reader)
         {
-            //num количество столбцов
-            while (r.Read())
+            int Count = reader.FieldCount;
+            
+            if (!reader.HasRows) {
+                reader.Close();
+                return false;
+                }
+            
+            if (reader.HasRows) // если есть данные
             {
-                if (num == 1)
-                {
-                    Console.WriteLine(r[0]);
+                // выводим названия столбцов
+                if (Count == 1)
+                {                    
+                    Console.WriteLine(String.Format("|{0,35}|", reader.GetName(0)));
                 }
-                if(num == 2)
+                if (Count == 2)
                 {
-                    Console.WriteLine("{0}\t{1}", r[0], r[1]);
+                    Console.WriteLine(String.Format("|{0,35}|{1,20}|", reader.GetName(0), reader.GetName(1)));
                 }
-                if (num == 3)
+                if (Count == 3)
                 {
-                    Console.WriteLine("{0}\t{1}\t{2}", r[0], r[1], r[2]);
+                    Console.WriteLine(String.Format("|{0,35}|{1,20}|{2,20}|", reader.GetName(0), reader.GetName(1), reader.GetName(2)));
                 }
+                while (reader.Read()) // построчно считываем данные
+                {
+                    if (Count == 1)
+                    {
+                        if (reader.IsDBNull(0))
+                        {
+                            reader.Close();
+                            return false;
+                        }
+                        Console.WriteLine(String.Format("|{0,35}|", reader.GetString(0)));
+                    }
+                    if (Count == 2)
+                    {
+                        Console.WriteLine(String.Format("|{0,35}|{1,20}|", reader.GetString(0), reader.GetString(1)));
+                    }
+                    if (Count == 3)
+                    {
+                        Console.WriteLine(String.Format("|{0,35}|{1,20}|{2,20}|", reader.GetString(0), reader.GetString(1), reader.GetString(2)));
+                    }
+                }
+                Console.WriteLine();
             }
-            r.Close();
+            reader.Close();
+            return true;
         }
 
-        public void DoUnique(string from_table,string find_col,string out_name,bool full_out)
+        public void DoUnique(string from_table,string find_col)
         {
-            string sql = $"SELECT count(distinct {find_col}) FROM catbd.{from_table}";
+            Console.WriteLine(from_table);
+            string sql = $"SELECT {find_col},count({find_col}) FROM catbd.{from_table} group by {find_col}";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
-            string countU = cmd.ExecuteScalar().ToString();
-
-            sql = $"SELECT count({find_col}) FROM catbd.{from_table}";
-            cmd = new MySqlCommand(sql, conn);
-            string countAll = cmd.ExecuteScalar().ToString();
-
-            Console.WriteLine($"Уникальные {out_name}: {countU}  Общее число: {countAll}");
-            if (full_out)
-            {
-                sql = $"SELECT {find_col} FROM catbd.{from_table}";
-                cmd = new MySqlCommand(sql, conn);
-                MySqlDataReader reader = cmd.ExecuteReader();
-                IDataReader dataRecord = reader;
-                Console.WriteLine($"{out_name}:");
-                QuareryOut(reader, 1);
-            }
-            Console.WriteLine();
+            MySqlDataReader reader = cmd.ExecuteReader();
+            QuareryOut(reader);
         }
         
         public void CheckUnique()
         {
-            //from_table    find_col   out_name  full_out
-            DoUnique("breed", "breed_id",  "Породы", false);
-            DoUnique("pride", "pride_id", "Прайды", false);
-            DoUnique("family", "family_id", "Семьи", false);
-            DoUnique("cat", "nickname", "Клички", true);
+            //from_table    find_col  
+            DoUnique("breed", "title");
+            DoUnique("pride", "title");
+            DoUnique("family", "title");
+            DoUnique("cat", "nickname");
 
         }
         public void CheackCats()
         {
-            string sql = $"SELECT count(distinct cat_id) FROM catbd.cat_owner AS b1 where (select count(owner_id) from cat_owner AS b2 where b1.cat_id=b2.cat_id)=2";
-            MySqlCommand cmd = new MySqlCommand(sql, conn);            
-            string countU = cmd.ExecuteScalar().ToString();
-            Console.WriteLine($"Котов с двумя хозяевами: {countU}");
-
-            Console.WriteLine("Коты\tИх хозяева");
-            sql = $"SELECT distinct cat_id,name FROM cat_owner as b1 inner join owner on b1.owner_id=owner.owner_id where (select count(owner_id) from cat_owner AS b2 where b1.cat_id=b2.cat_id)=2";
-            cmd = new MySqlCommand(sql, conn);
+            string sql = $"SELECT cat_id,count(cat_id) as num from cat_owner group by cat_id having num=2";
+            MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader reader = cmd.ExecuteReader();
-            QuareryOut(reader, 2);
+            QuareryOut(reader);
 
-
-
-            sql = $"SELECT count(distinct cat_id) FROM catbd.cat_owner AS b1 where (select count(owner_id) from cat_owner AS b2 where b1.cat_id=b2.cat_id)=3";
-            cmd = new MySqlCommand(sql, conn);
-            countU = cmd.ExecuteScalar().ToString();
-            Console.WriteLine($"Котов с тремя хозяевами: {countU}");
-
-            Console.WriteLine("Коты\tИх хозяева");
-            sql = $"SELECT distinct cat_id,name FROM cat_owner as b1 inner join owner on b1.owner_id=owner.owner_id where (select count(owner_id) from cat_owner AS b2 where b1.cat_id=b2.cat_id)=3";
+            sql = $"SELECT cat_id,count(cat_id) as num from cat_owner group by cat_id having num=3";
             cmd = new MySqlCommand(sql, conn);
             reader = cmd.ExecuteReader();
-            QuareryOut(reader, 2);
-
-
+            QuareryOut(reader);
 
             Console.WriteLine("Коты с неколькими хозяевами из одной семьи:");
-            sql = $"SELECT cat_id,count(owner.name),family.title from cat_owner inner JOIN owner \r\non owner.owner_id = cat_owner.owner_id inner join owner_family \r\non cat_owner.owner_id = owner_family.owner_id inner join family \r\non family.family_id = owner_family.family_id\r\ngroup by cat_id,family.title\r\nhaving count(owner.name)>1";
+            string line;sql = "";
+            StreamReader sr = new StreamReader("CheackCats.sql");
+            line = sr.ReadLine();    //читаем запрос из файла
+            while (line != null)
+            {
+                sql = sql + " " + line;
+                line = sr.ReadLine();
+            }            
             cmd = new MySqlCommand(sql, conn);
             reader = cmd.ExecuteReader();
-            QuareryOut(reader, 3);
-
-            Console.WriteLine($"\n По итогу их:");
-            sql = $"with t as(SELECT cat_id,count(owner.name),family.title from cat_owner inner JOIN owner \r\non owner.owner_id = cat_owner.owner_id inner join owner_family \r\non cat_owner.owner_id = owner_family.owner_id inner join family \r\non family.family_id = owner_family.family_id\r\ngroup by cat_id,family.title\r\nhaving count(owner.name)>1)\r\nselect count(cat_id) from t";
-            cmd= new MySqlCommand(sql, conn);
-            countU=cmd.ExecuteScalar().ToString();
-            Console.WriteLine(countU);
+            QuareryOut(reader);            
         }
         public void CheackWithout()
         {
@@ -388,14 +441,19 @@ namespace itrying
             string sql = $"SELECT title from pride where pride_id not in (Select pride_id From cat)";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader reader = cmd.ExecuteReader();
-            QuareryOut(reader, 1);
-            Console.WriteLine();
+            QuareryOut(reader);
+
+            Console.WriteLine("Породы без котов");
+            sql = $"SELECT title from breed where breed_id not in (Select breed_id From cat)";
+            cmd = new MySqlCommand(sql, conn);
+            reader = cmd.ExecuteReader();
+            QuareryOut(reader);
 
             Console.WriteLine("Семьи без хозяев");
             sql = $"SELECT title from family where family_id not in (Select family_id From owner_family)";
             cmd = new MySqlCommand(sql, conn);
             reader = cmd.ExecuteReader();
-            QuareryOut(reader, 1);
+            QuareryOut(reader);
         }
         public void DoQuareries(int x)
         {
@@ -408,39 +466,17 @@ namespace itrying
                 line = sr.ReadLine();
             }
             MySqlCommand cmd = new MySqlCommand(sql, conn);
-            if (x == 1 || x==2 || x==3 || x==5 || x==8 || x==9 || x==10)
-            {
-                MySqlDataReader reader = cmd.ExecuteReader();
-                IDataReader dataRecord = reader;
-                Console.WriteLine($"title");
-                QuareryOut(reader, 1);
-                Console.WriteLine();
-            }
-            if (x == 4)
-            {
-                MySqlDataReader reader = cmd.ExecuteReader();
-                IDataReader dataRecord = reader;
-                Console.WriteLine($"AVG(cat.age)");
-                QuareryOut(reader, 1);
-                Console.WriteLine();
-            }
-            if (x == 6)
-            {
-                MySqlDataReader reader = cmd.ExecuteReader();
-                IDataReader dataRecord = reader;
-                Console.WriteLine($"Количество людей в семье Рабинович");
-                QuareryOut(reader, 1);
-                Console.WriteLine();
-            }
-            if (x == 7)
-            {
-                MySqlDataReader reader = cmd.ExecuteReader();
-                IDataReader dataRecord = reader;
-                Console.WriteLine($"Количество котов в семье Энгельс");
-                QuareryOut(reader, 1);
-                Console.WriteLine();
-            }
+            MySqlDataReader reader = cmd.ExecuteReader();            
+            bool is_out=QuareryOut(reader);
             sr.Close();
+            if(x==9 && !is_out)
+            {
+                Console.WriteLine("У Карла Маркса нет котов");
+            }
+            if (x == 4 && !is_out)
+            {
+                Console.WriteLine("Нет котов породы сфинкс");
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ if (CreateData == "Да") {
     sql = query.cat_owner();
     cmd = new MySqlCommand(sql, conn);
     cmd.ExecuteNonQuery();
-
+    
     sql = query.owner_family();
     cmd = new MySqlCommand(sql, conn);
     cmd.ExecuteNonQuery();
