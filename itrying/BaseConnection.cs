@@ -14,7 +14,7 @@ namespace itrying
         {
             string host = "127.0.0.1";
             int port = 3306;
-            string database = "sys";
+            string database = "catbd";
             string username = "root";
             string password = "P@ssw0rd";
 

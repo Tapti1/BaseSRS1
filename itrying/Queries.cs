@@ -66,7 +66,7 @@ namespace itrying
                 d[s] = 1;
             }
             sr.Close();
-            r =r+"INSERT INTO breed(title) VALUES ";    //сам запрос
+            r =r+"INSERT INTO catbd.breed(title) VALUES ";    //сам запрос
             r = r + ($"('сфинкс')");
             foreach (var person in d)
             {
@@ -368,13 +368,14 @@ namespace itrying
                 }
                 while (reader.Read()) // построчно считываем данные
                 {
-                    if (Count == 1)
-                    {
-                        if (reader.IsDBNull(0))
-                        {
+                    ////////////////////////////проверяет содержит ли столбец null
+                    if (reader.IsDBNull(0)) {                         
                             reader.Close();
                             return false;
-                        }
+                    }                   
+
+                    if (Count == 1)
+                    {
                         Console.WriteLine(String.Format("|{0,35}|", reader.GetString(0)));
                     }
                     if (Count == 2)
@@ -395,7 +396,12 @@ namespace itrying
         public void DoUnique(string from_table,string find_col)
         {
             Console.WriteLine(from_table);
-            string sql = $"SELECT {find_col},count({find_col}) FROM catbd.{from_table} group by {find_col}";
+            ///////////////////////////////будет соединяться с заданной базой
+            string sql = $"SELECT {find_col},count({find_col}) FROM {from_table} group by {find_col}";
+           
+            ///////////////////////////////с конкретной
+            //string sql = $"SELECT {find_col},count({find_col}) FROM dogdb.{from_table} group by {find_col}";
+            
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader reader = cmd.ExecuteReader();
             QuareryOut(reader);
@@ -437,7 +443,8 @@ namespace itrying
         }
         public void CheackWithout()
         {
-            Console.WriteLine("Прайды без котов");
+            Console.WriteLine(@"Прайды
+                                без котов");
             string sql = $"SELECT title from pride where pride_id not in (Select pride_id From cat)";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader reader = cmd.ExecuteReader();
